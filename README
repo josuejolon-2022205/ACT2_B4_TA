@@ -1,0 +1,134 @@
+# 📦 Sistema de Gestión y Registro de Productos (EjercicioS2_B4_TA)
+
+Aplicación Fullstack desarrollada con **Angular** en el Frontend y **Express.js (Node.js)** con **PostgreSQL** en el Backend. El proyecto incluye un formulario reactivo con validaciones en tiempo real, data binding, previsualización de datos, resumen de inventario y manejo defensivo de errores HTTP.
+
+---
+
+## Características Principales
+
+### Frontend (Angular)
+- **Formulario Reactivo (`Reactive Forms`)**: Registro de productos definiendo controles con `FormBuilder` y `FormGroup`.
+- **Validaciones en Tiempo Real**:
+  - `nombre`: Campo obligatorio con longitud mínima de 3 caracteres.
+  - `precio`: Campo obligatorio con valor numérico mayor a `$0.00`.
+  - `cantidad`: Campo obligatorio con números enteros positivos (mínimo 1 unidad).
+- **Gestión de Estados de Control**: Clases dinámicas CSS que evalúan los estados `touched`, `dirty`, `invalid` y `valid`.
+- **Data Binding Bidireccional**: Previsualización en tiempo real del modelo y estado del formulario (`VÁLIDO` / `INVÁLIDO`).
+- **Tabla de Productos e Inventario**: Cálculo automático de stock total y valor acumulado del inventario.
+- **Manejo Defensivo de Errores**:
+  - Evita bloqueos en renderizado SSR mediante la directiva `isPlatformBrowser`.
+  - Cancelación automática de peticiones lentas mediante operador `timeout` de RxJS (5 segundos max).
+
+### Backend (Express + PostgreSQL)
+- **API RESTful**: Endpoints estructurados en controladores, servicios y rutas de Express en TypeScript.
+- **Base de Datos PostgreSQL**: Conexión mediante `pg.Pool` con creación automática de tablas (`productos` y `usuarios`) y siembra de datos iniciales (*seeding*).
+- **Mecanismo de Respaldo (*Fallback*)**: Ante fallos de conexión o autenticación en PostgreSQL, el servicio activa un almacenamiento en memoria de contingencia para mantener la aplicación 100% operativa.
+
+---
+
+## Tecnologías Utilizadas
+
+- **Frontend**: Angular 19/22, TypeScript, RxJS, ReactiveFormsModule, HTML5, CSS3.
+- **Backend**: Node.js, Express.js, TypeScript, PostgreSQL (`pg`), CORS, Dotenv.
+- **Gestor de Paquetes**: `pnpm`.
+
+---
+
+## Estructura del Proyecto
+
+```text
+EjercicioS2_B4_TA/
+├── backend/
+│   ├── src/
+│   │   ├── config/          # Configuración y piscina de conexiones PostgreSQL
+│   │   ├── controller/      # Controladores HTTP (obtenerProductos, agregarProductos)
+│   │   ├── models/          # Interfaces TypeScript de modelos
+│   │   ├── router/          # Definición de rutas API
+│   │   ├── service/         # Lógica de negocio y respaldo en memoria
+│   │   └── index.ts         # Punto de entrada del servidor Express (Puerto 3000)
+│   ├── .env                 # Variables de entorno para PostgreSQL y puerto
+│   └── package.json
+│
+└── frontend/
+    ├── src/
+    │   └── app/
+    │       ├── components/
+    │       │   └── productos/ # Componente principal (Formulario y Tabla)
+    │       ├── models/        # Modelos TypeScript del Frontend
+    │       └── service/       # ProductoService (Comunicación HTTP HttpClient)
+    └── package.json
+```
+
+---
+
+## Requisitos Previos
+
+- **Node.js** v18 o superior.
+- **pnpm** instalado globalmente (`npm install -g pnpm`).
+- **PostgreSQL** (Opcional: si la BD no está disponible, el sistema operará con el respaldo en memoria integrado).
+
+---
+
+## Instalación y Configuración
+
+### 1. Configurar y Ejecutar el Backend
+
+1. Navega a la carpeta del backend:
+   ```bash
+   cd backend
+   ```
+2. Instala las dependencias:
+   ```bash
+   pnpm install
+   ```
+3. Verifica o crea el archivo `.env` en la raíz de `/backend`:
+   ```env
+   DB_USER=postgres
+   DB_PASSWORD=2009
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=postgres
+   PORT=3000
+   JWT_SECRET=mi_secreto_super_seguro
+   ```
+4. Inicia el servidor en modo desarrollo:
+   ```bash
+   pnpm run dev
+   ```
+   *El servidor se ejecutará en `http://localhost:3000`.*
+
+---
+
+### 2. Configurar y Ejecutar el Frontend
+
+1. Abre una nueva terminal y navega a la carpeta del frontend:
+   ```bash
+   cd frontend
+   ```
+2. Instala las dependencias:
+   ```bash
+   pnpm install
+   ```
+3. Inicia la aplicación Angular:
+   ```bash
+   pnpm run start
+   ```
+4. Abre tu navegador e ingresa a `http://localhost:4200` (o la URL indicada en consola).
+
+---
+
+## 📡 Endpoints de la API REST
+
+| Método | Endpoint     | Descripción                          | Body (JSON) |
+|--------|--------------|--------------------------------------|-------------|
+| `GET`  | `/productos` | Obtener la lista de productos         | N/A         |
+| `POST` | `/productos` | Registrar un nuevo producto en la BD | `{ "nombre": string, "precio": number, "cantidad": number }` |
+
+---
+
+## 📝 Documentación del Flujo de Validación
+
+1. **Entrada de Datos**: El usuario interactúa con los controles del `FormGroup`.
+2. **Evaluación de Controles**: Se evalúan las reglas con `Validators`. Si un control es inválido y ha sido tocado (`touched`), la vista resalta el input en rojo y genera los mensajes de error correspondientes mediante directivas `*ngIf` y `*ngFor`.
+3. **Validación de Envío**: Al hacer clic en "Registrar Producto", la función `guardarProducto()` verifica `productoForm.valid`. Si es inválido, invoca `markAllAsTouched()` impidiendo el envío HTTP.
+4. **Envío HTTP**: Si el formulario es válido, `ProductoService.createProducto()` realiza un `POST` a la API. Al recibir la respuesta exitosa, se resetea el formulario y se actualiza dinámicamente la tabla.
