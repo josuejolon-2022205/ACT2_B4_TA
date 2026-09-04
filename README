@@ -1,4 +1,4 @@
-# 📦 Sistema de Gestión y Registro de Productos (EjercicioS2_B4_TA)
+# Sistema de Gestión y Registro de Productos (EjercicioS2_B4_TA)
 
 Aplicación Fullstack desarrollada con **Angular** en el Frontend y **Express.js (Node.js)** con **PostgreSQL** en el Backend. El proyecto incluye un formulario reactivo con validaciones en tiempo real, data binding, previsualización de datos, resumen de inventario y manejo defensivo de errores HTTP.
 
@@ -126,7 +126,7 @@ EjercicioS2_B4_TA/
 
 ---
 
-## 📝 Documentación del Flujo de Validación
+## Documentación del Flujo de Validación
 
 1. **Entrada de Datos**: El usuario interactúa con los controles del `FormGroup`.
 2. **Evaluación de Controles**: Se evalúan las reglas con `Validators`. Si un control es inválido y ha sido tocado (`touched`), la vista resalta el input en rojo y genera los mensajes de error correspondientes mediante directivas `*ngIf` y `*ngFor`.
