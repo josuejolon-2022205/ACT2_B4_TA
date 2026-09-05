@@ -1,0 +1,124 @@
+<div class="contenedor"> 
+  <header class="header"> 
+    <h1>Formulario productos</h1> 
+    <p class="subtitulo"></p> 
+  </header> 
+ 
+  <section class="card-formulario"> 
+    <h2>Registrar Nuevo Producto</h2> 
+ 
+    <div *ngIf="mensajeExito" class="alerta alerta-exito"> 
+      {{ mensajeExito }} 
+    </div> 
+ 
+    <div *ngIf="errorMensaje" class="alerta alerta-error"> 
+      ❌ <strong>Error:</strong> {{ errorMensaje }} 
+    </div> 
+ 
+    <form [formGroup]="productoForm" (ngSubmit)="guardarProducto()" class="formulario"> 
+      <div class="form-group"> 
+        <label for="nombre">Nombre del Producto <span class="requerido">*</span></label> 
+        <input 
+          id="nombre" 
+          type="text" 
+          formControlName="nombre" 
+          placeholder="Ej: Café instantáneo, Queso crema..." 
+          [class.input-error]="campoNombre?.invalid && (campoNombre?.touched || campoNombre?.dirty)" 
+          [class.input-valido]="campoNombre?.valid && (campoNombre?.touched || campoNombre?.dirty)" 
+        /> 
+        <ul *ngIf="getErroresNombre().length > 0" class="lista-errores"> 
+          <li *ngFor="let error of getErroresNombre()"> {{ error }}</li> 
+        </ul> 
+      </div> 
+ 
+      <div class="form-row"> 
+ 
+        <div class="form-group"> 
+          <label for="precio">Precio (quetzales) <span class="requerido">*</span></label> 
+          <input 
+            id="precio" 
+            type="number" 
+            step="0.01" 
+            formControlName="precio" 
+            placeholder="0.00" 
+            [class.input-error]="campoPrecio?.invalid && (campoPrecio?.touched || campoPrecio?.dirty)" 
+            [class.input-valido]="campoPrecio?.valid && (campoPrecio?.touched || campoPrecio?.dirty)" 
+          /> 
+          <ul *ngIf="getErroresPrecio().length > 0" class="lista-errores"> 
+            <li *ngFor="let error of getErroresPrecio()">{{ error }}</li> 
+          </ul> 
+        </div> 
+ 
+        <div class="form-group"> 
+          <label for="cantidad">Cantidad en Stock <span class="requerido">*</span></label> 
+          <input 
+            id="cantidad" 
+            type="number" 
+            formControlName="cantidad" 
+            placeholder="0" 
+            [class.input-error]="campoCantidad?.invalid && (campoCantidad?.touched || campoCantidad?.dirty)" 
+            [class.input-valido]="campoCantidad?.valid && (campoCantidad?.touched || campoCantidad?.dirty)" 
+          /> 
+          <ul *ngIf="getErroresCantidad().length > 0" class="lista-errores"> 
+            <li *ngFor="let error of getErroresCantidad()"> {{ error }}</li> 
+          </ul> 
+        </div> 
+      </div> 
+ 
+      <button type="submit" class="btn-submit" [disabled]="guardando"> 
+        {{ guardando ? 'Registrando producto...' : 'Registrar Producto' }} 
+      </button> 
+    </form> 
+  </section> 
+ 
+  <section class="card-tabla"> 
+    <div class="tabla-header"> 
+      <h2>Productos Registrados</h2> 
+      <button type="button" class="btn-cargar" (click)="cargarProductos()" [disabled]="cargando"> 
+        {{ cargando ? 'Cargando...' : 'Recargar Lista' }} 
+      </button> 
+    </div> 
+ 
+    <div *ngIf="cargando" class="estado-cargando"> 
+      Cargando datos de productos desde el servidor... 
+    </div> 
+ 
+    <div *ngIf="!cargando && productos.length === 0" class="estado-vacio"> 
+      no hay productos registrados en el sistema 
+    </div> 
+ 
+    <div *ngIf="!cargando && productos.length > 0" class="resumen-inventario"> 
+      <div class="tarjeta-resumen"> 
+        <span class="label">Total Productos:</span> 
+        <span class="valor">{{ productos.length }}</span> 
+      </div> 
+      <div class="tarjeta-resumen"> 
+        <span class="label">Stock Total:</span> 
+        <span class="valor">{{ totalStock }} unidades.</span> 
+      </div> 
+      <div class="tarjeta-resumen"> 
+        <span class="label">Valor Inventario:</span> 
+        <span class="valor">Q{{ valorInventario | number:'1.2-2' }}</span> 
+      </div> 
+    </div> 
+ 
+    <table *ngIf="!cargando && productos.length > 0"> 
+      <thead> 
+        <tr> 
+          <th>ID</th> 
+          <th>Nombre</th> 
+          <th>Precio</th> 
+          <th>Cantidad</th> 
+        </tr> 
+      </thead> 
+      <tbody> 
+        <tr *ngFor="let producto of productos"> 
+          <td>#{{ producto.id }}</td> 
+          <td><strong>{{ producto.nombre }}</strong></td> 
+          <td>Q{{ producto.precio | number:'1.2-2' }}</td> 
+          <td>{{ producto.cantidad }}</td> 
+        </tr> 
+      </tbody> 
+    </table> 
+  </section> 
+</div>
